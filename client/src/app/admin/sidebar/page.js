@@ -36,7 +36,7 @@ const Sidebar = () => {
           </ChakraLink>
           
           <ChakraLink 
-            onClick={() => handleNavigation('/listproduct')}
+            onClick={() => handleNavigation('/admin/listbook')}
             _hover={{ textDecoration: "none", cursor: "pointer" }}
           >
             <Flex align="center" gap="4">

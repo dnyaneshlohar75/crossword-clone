@@ -1,6 +1,6 @@
-'use client'; 
+'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Input, Select, Button, Image, Stack, FormLabel, FormControl, Container, useToast } from '@chakra-ui/react';
 import Header from '@/app/admin/header/page';
 import HeaderSection from '@/app/admin/headersection/page';
@@ -8,51 +8,105 @@ import Sidebar from '../sidebar/page';
 
 const AddBook = () => {
   const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [bookDetails, setBookDetails] = useState({
-      name: '',
-      price: '',
-      category: 'sudha murthy',
-      image: "",
+    name: '',
+    author: '',
+    price: '',
+    category: 'sudha-murthy',
+    image: '',
   });
   const toast = useToast();
 
+  useEffect(() => {
+    if (image) {
+      const objectUrl = URL.createObjectURL(image);
+      setImagePreview(objectUrl);
+
+      return () => URL.revokeObjectURL(objectUrl);
+    } else {
+      setImagePreview(null);
+    }
+  }, [image]);
+
   const imageHandler = (e) => {
     if (e.target.files.length > 0) {
-        setImage(e.target.files[0]);
+      setImage(e.target.files[0]);
     }
-};
+  };
 
   const changeHandler = (e) => {
-      setBookDetails({ ...bookDetails, [e.target.name]: e.target.value });
+    setBookDetails({ ...bookDetails, [e.target.name]: e.target.value });
   };
-  
+
   const addBook = async () => {
     try {
       let formData = new FormData();
       if (image) {
         formData.append('book', image);
       }
-
-      const response = await fetch('http://localhost:8000/upload', {
+  
+      const uploadResponse = await fetch('http://localhost:8000/upload', {
         method: 'POST',
         body: formData,
       });
   
-      const responseData = await response.json();
-      
-      if (responseData.success) {
-        toast({
+      if (!uploadResponse.ok) {
+        const errorText = await uploadResponse.text();
+        throw new Error(`Upload failed: ${errorText}`);
+      }
+  
+      const uploadData = await uploadResponse.json();
+  
+      if (uploadData.success) {
+        const updatedBookDetails = { ...bookDetails, image: uploadData.image_url };
+  
+        const addBookResponse = await fetch('http://localhost:8000/addbook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(updatedBookDetails),
+        });
+  
+        if (!addBookResponse.ok) {
+          const errorText = await addBookResponse.text();
+          throw new Error(`Add book failed: ${errorText}`);
+        }
+  
+        const addBookData = await addBookResponse.json();
+  
+        if (addBookData.success) {
+          toast({
             title: 'Book Added',
             status: 'success',
             duration: 5000,
             isClosable: true,
-        });
-      } else {
-        toast({
-            title: 'Failed to upload image',
+          });
+          setBookDetails({
+            name: '',
+            author: '',
+            price: '',
+            category: 'sudha-murthy',
+            image: '',
+          });
+          setImage(null);
+          setImagePreview(null);
+        } else {
+          toast({
+            title: 'Failed to add book',
             status: 'error',
             duration: 5000,
             isClosable: true,
+          });
+        }
+      } else {
+        toast({
+          title: 'Failed to upload image',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
         });
       }
     } catch (error) {
@@ -67,8 +121,9 @@ const AddBook = () => {
     }
   };
   
+
   return (
-    <Container maxW="container.x" p={0}>
+    <Container maxW="container.x" p={6}>
       <Header /> 
       <HeaderSection />
       
@@ -84,6 +139,17 @@ const AddBook = () => {
                 onChange={changeHandler}
                 type="text"
                 name="name"
+                placeholder="Type here"
+              />
+            </FormControl>
+
+            <FormControl id="author">
+              <FormLabel>Author Name</FormLabel>
+              <Input
+                value={bookDetails.author}
+                onChange={changeHandler}
+                type="text"
+                name="author"
                 placeholder="Type here"
               />
             </FormControl>
@@ -120,7 +186,7 @@ const AddBook = () => {
               <FormLabel>Book Image</FormLabel>
               <label htmlFor="file-input">
                 <Image
-                  src={image ? URL.createObjectURL(image) : '/images/upload_area.svg'}
+                  src={imagePreview || '/images/upload_area.svg'}
                   alt="Upload Area"
                   boxSize="150px"
                   objectFit="cover"
@@ -131,7 +197,6 @@ const AddBook = () => {
               <Input
                 onChange={imageHandler}
                 type="file"
-                name="image"
                 id="file-input"
                 hidden
               />

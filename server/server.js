@@ -7,6 +7,8 @@ const connectDB = require('./config/db');
 
 dotenv.config();
 
+const PORT = process.env.PORT || 8000;
+
 // Connect to MongoDB
 connectDB();
 
@@ -19,10 +21,11 @@ app.use(express.json()); // Parse JSON bodies
 
 app.use('/api/test', require('./routes/testRoutes'));
 app.use('/api/books', require('./routes/bookRoutes'));
+app.use('/api/cart', require('./routes/cartRoutes'));
 
 // Image Storage Engine
 const storage = multer.diskStorage({
-    destination: './upload/images',
+    destination: path.join(__dirname, 'upload/images'),
     filename: (req, file, cb) => {
       cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
@@ -30,28 +33,19 @@ const storage = multer.diskStorage({
   
   const upload = multer({ storage: storage });
 
-  // Creating Upload Endpoint for images
+  // Creating Upload Endpoint for images (Middleware )
   app.use('/images', express.static(path.join(__dirname, 'upload/images')));
-  
-  app.post("/upload", upload.single('book'), (req, res) => {
-      console.log('File:', req.file);
-  
-      if (!req.file) {
-          return res.status(400).json({
-              success: 0,
-              message: 'No file uploaded'
-          });
-      }
-  
-      res.json({
-       success: 1,
-       image_url: `http://localhost:${process.env.PORT || 8000}/images/${req.file.filename}`
-    //   image_url: `http://localhost:${PORT}/images/${req.file.filename}`
-    })
-  })
-  
 
-const PORT = process.env.PORT || 8000;
+  app.post("/upload", upload.single('book'), (req, res) => {
+      
+    if (req.file) {
+      const imageUrl = `http://localhost:8000/images/${req.file.filename}`;
+      res.json({ success: true, image_url: imageUrl });
+  } else {
+      res.status(400).json({ success: false, message: 'No file uploaded' });
+  }
+});
+  
 
 app.listen(PORT, () => {
     console.log(`Node Server Running In ${process.env.DEV_MODE || 'development'} Mode On Port ${PORT}`);

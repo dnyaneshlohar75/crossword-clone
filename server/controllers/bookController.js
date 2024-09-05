@@ -7,9 +7,10 @@ const addbookController = async (req, res) => {
         const book = new Book({
             id: req.body.id,  
             name: req.body.name,
-            image: req.body.image,
+            image: req.body.image, 
             category: req.body.category,
             price: req.body.price,
+            author: req.body.author          
         });
 
         await book.save();
@@ -29,57 +30,106 @@ const addbookController = async (req, res) => {
     }
 };
 
-// app.post('/removebook', async (req, res) => {
-//     await Book.findOneAndDelete({ id: req.body.id });
-//     console.log("Removed");
-//     res.json({
-//         success: true,
-//         name: req.body.name,
-//     })
-// })
-
-// app.get('/allbooks', async(req, res)=> {
-//     let books = await Book.find({});
-//     console.log("All Products Fetched");
-//     res.send(books);
-// })
-
-// app.get('/sudha-murthy', async (req, res) => {
-//     let books = await Book.find({});
-//     let sudhamurthy = books.slice(1).slice(-8);
-//     console.log("Sudha Murthy Fetched");
-//     res.send(sudhamurthy);
-// })
-
-const getProductsByCategoryController = async (req, res) => {
-  const category = req.params.category;
-
-  try {
-      const products = await Product.find({ category: category });
-
-      if (products.length === 0) {
-          return res.status(404).json({
-              success: false,
-              message: 'No products found in this category'
-          });
-      }
-
-      // Send the products 
-      res.json({
+  const getBooksByCategoryController = async (req, res) => {
+    const category = req.params.category;
+  
+    try {
+        const books = await Book.find({ category });
+  
+        if (books.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No books found in this category'
+            });
+        }
+  
+        console.log(`${category} Books Fetched`);
+        // Send the response with the fetched books
+        return res.status(200).json({
           success: true,
-          products: products
-      });
-  } catch (error) {
-      console.error('Error retrieving products by category:', error);
-
-      res.status(500).json({
+          books,
+        });
+      } catch (error) {
+        console.error('Error fetching books by category:', error);
+        return res.status(500).json({
           success: false,
-          error: error.message || 'Internal Server Error'
-      });
-  }
-};
+          message: 'Server error',
+          error: error.message,
+        });
+      }
+    };
+
+    const getBookById = async (req, res) => {
+      try {
+        const bookId = Number(req.params.id);  
+        const book = await Book.findOne({ id: bookId });
+    
+        if (!book) {
+          return res.status(404).send({
+            success: false,
+            message: "Book not found",
+          });
+        }
+    
+        res.status(200).send({
+          success: true,
+          book,
+        });
+      } catch (error) {
+        console.error("Error fetching book: ", error);
+        res.status(500).send({
+          success: false,
+          message: "Error fetching book",
+          error: error.message || error,
+        });
+      }
+    };
+    
+    
+    const getAllBooks = async (req, res) => {
+      try {
+          let books = await Book.find({});
+          console.log("All Books Fetched");
+          res.json(books);
+      } catch (error) {
+          console.error("Error fetching books:", error);
+          res.status(500).json({ message: "Internal server error" });
+      }
+  };
+  
+    const removeBookController = async (req, res) => {
+        try {
+          // Find and delete the book by its ID
+          const result = await Book.findOneAndDelete({ _id: req.body.id });
+      
+          if (!result) {
+            return res.status(404).json({
+              success: false,
+              message: 'Book not found',
+            });
+          }
+      
+          console.log("Removed");
+      
+          return res.status(200).json({
+            success: true,
+            name: result.name,
+          });
+        } catch (error) {
+          console.error('Error removing book:', error);
+          return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message,
+          });
+        }
+      };
+    
 
 module.exports = {
-    addbookController ,
-    getProductsByCategoryController
+    addbookController , 
+    getAllBooks,
+    removeBookController, 
+    getBooksByCategoryController,
+    getBookById
 };

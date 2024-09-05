@@ -1,12 +1,13 @@
 import React from 'react';
 import {
-  Container,
+  Container, Box
 } from '@chakra-ui/react';
 import Header from '@/components/header';
 import HeaderSection from '@/components/HeaderSection';
 import ImageSlider from '@/components/Imageslider';
 import TextSlider from '@/components/Textslider';
 import CategoryTags from '@/components/Categorytags';
+import SudhaMurthy from '@/components/sudhamurthy';
 import Footer from '@/components/Footer';
 
 const Dashboard = () => {
@@ -17,7 +18,10 @@ const Dashboard = () => {
      <CategoryTags/>
      <TextSlider/>
      <ImageSlider/>  
-     <Footer/>
+     <SudhaMurthy/>  
+     <Box>
+       <Footer/>
+     </Box>
     </Container>
   );
 };

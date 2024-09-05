@@ -1,4 +1,4 @@
-import { Box, Container, Stack, Text, Link, SimpleGrid, VStack, Image, Flex } from '@chakra-ui/react';
+import { Box, Container, Stack, Text, Link, SimpleGrid, VStack, Image, Flex, Divider } from '@chakra-ui/react';
 import { MdEmail } from 'react-icons/md';
 import { FaWhatsapp } from 'react-icons/fa';
 
@@ -38,6 +38,7 @@ const Footer = () => {
           <SimpleGrid columns={{ base: 2, md: 4 }} spacing={8}>
             <VStack align="start">
               <Text fontWeight="bold">Category</Text>
+              <Divider borderWidth="1px" mb={6} />
               <Link href="#" fontSize="13px">New & Noteworthy</Link>
               <Link href="#" fontSize="13px">Top 50</Link>
               <Link href="#" fontSize="13px">Crossword Recommends</Link>
@@ -50,6 +51,7 @@ const Footer = () => {
             </VStack>
             <VStack align="start">
               <Text fontWeight="bold">Useful links</Text>
+              <Divider borderWidth="1px" mb={6} />
               <Link href="#" fontSize="13px">Secure Shopping</Link>
               <Link href="#" fontSize="13px">Privacy Policy</Link>
               <Link href="#" fontSize="13px">Terms of Use</Link>
@@ -61,6 +63,7 @@ const Footer = () => {
             </VStack>
             <VStack align="start">
               <Text fontWeight="bold">About us</Text>
+              <Divider borderWidth="1px" mb={6}/>
               <Link href="#" fontSize="13px">Store Locator</Link>
               <Link href="#" fontSize="13px">Kids Club</Link>
               <Link href="#" fontSize="13px">Blogs</Link>
@@ -71,6 +74,7 @@ const Footer = () => {
             </VStack>
             <VStack align="start">
               <Text fontWeight="bold">Get in Touch</Text>
+              <Divider mb={6} />
               <Link href="#" fontSize="13px">Careers</Link>
               <Link href="#" fontSize="13px">Become a Franchisee</Link>
               <Link href="#" fontSize="13px">Contact Us</Link>
