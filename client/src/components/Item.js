@@ -119,14 +119,43 @@ const Item = ({ id, image, name, author, price, discount }) => {
       <ButtonGroup spacing="2" justifyContent="center" mt={4}>
        
         {isExist(id) ? (
-          <Button>Go to Bag</Button>
+          <Button  
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          color="#000000" 
+          border="1px solid black"
+          fontSize={14}
+          onClick={() => handleAddToBag()}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'black'; 
+            e.currentTarget.style.color = 'white'; 
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'white'; 
+            e.currentTarget.style.color = '#000000'; 
+          }}>
+            GO TO BAG
+            </Button>
         ) : (
           <Button
-            variant="ghost"
-            colorScheme="blue"
-            onClick={() => handleAddToBag()}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          color="#000000" 
+          border="1px solid black"
+          fontSize={14}
+          onClick={() => handleAddToBag()}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'black'; 
+            e.currentTarget.style.color = 'white'; 
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'white'; 
+            e.currentTarget.style.color = '#000000'; 
+          }}
           >
-            Add to bag
+            ADD TO BAG
           </Button>
         )}
         <Button

@@ -50,15 +50,15 @@ export default function page({params}) {
               <CardBody>
                 <Heading size="md">{result.name}</Heading>
   
-                <Text py="2">
+                {/* <Text py="2">
                   Caffè latte is a coffee beverage of Italian origin made with
                   espresso and steamed milk.
-                </Text>
+                </Text> */}
               </CardBody>
   
               <CardFooter>
                 <Button variant="solid" colorScheme="blue">
-                  Buy Now
+                 ADD TO BAG
                 </Button>
               </CardFooter>
             </Stack>

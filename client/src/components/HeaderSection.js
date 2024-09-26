@@ -38,18 +38,20 @@ const HeaderSection = () => {
       p={4}
       mx="auto"
     >
-      <Flex align="center" mr={4}>
-      <Image src="/images/logo.png" alt="logo" boxSize="70px" mr={4} />
+      <Flex align="center" mr={70}>
+      <Image src="/images/logo.png" alt="logo" boxSize="70px" mr={2} />
         <Link href="/">
           <Text fontSize="lg">CROSSWORD</Text>
         </Link>
       </Flex>
 
-      <SearchBar />
+      <Box mr={200} w="1000px">
+        <SearchBar />
+      </Box>
 
       <Flex align="center">
         {status === "authenticated" ? (
-          <Menu>
+          <Menu >
             <MenuButton>
               <Text>Hi!, {data?.user?.name}</Text>
             </MenuButton>
