@@ -1,5 +1,6 @@
 'use client'; 
 
+import LogoutButton from '@/components/LogoutButton';
 import { Box, Flex, Text, Link as ChakraLink, Image } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 
@@ -13,7 +14,7 @@ const Sidebar = () => {
   return (  
       <Box 
         width="250px" 
-        height="90vh" 
+        height="75vh" 
         bg="gray.800" 
         color="white" 
         p="10"
@@ -31,7 +32,7 @@ const Sidebar = () => {
                 borderRadius={5}
                 mr={4}
               /> 
-              <Text fontWeight={600}>Add Product</Text>
+              <Text fontWeight={600}>Add Book</Text>
             </Flex>
           </ChakraLink>
           
@@ -47,9 +48,10 @@ const Sidebar = () => {
                 borderRadius={5}
                 mr={4}
               />
-              <Text fontWeight={600}>Product List</Text>
+              <Text fontWeight={600}>Book List</Text>
             </Flex>
           </ChakraLink>
+          <LogoutButton />
         </Flex>
       </Box>
   );

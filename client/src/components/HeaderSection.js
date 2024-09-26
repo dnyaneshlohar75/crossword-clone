@@ -1,10 +1,30 @@
-import React from 'react';
-import { Box, Flex, Image, Text, Input, Button } from '@chakra-ui/react';
-import { AiOutlineSearch } from 'react-icons/ai';
-import { IoPersonSharp, IoBagOutline } from 'react-icons/io5';
-import { FaHeart } from 'react-icons/fa';
+"use client";
+
+import React from "react";
+import {
+  Box,
+  Flex,
+  Image,
+  Text,
+  Avatar,
+  Badge,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from "@chakra-ui/react";
+import { IoPersonSharp, IoBagOutline } from "react-icons/io5";
+import { FaHeart } from "react-icons/fa";
+import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
+import useCart from "@/providers/CartState";
+import SearchBar from "./SearchBar";
+import LogoutButton from "./LogoutButton";
 
 const HeaderSection = () => {
+  const { cart } = useCart();
+  const { data, status } = useSession();
+
   return (
     <Box
       maxW="100vw"
@@ -19,53 +39,61 @@ const HeaderSection = () => {
       mx="auto"
     >
       <Flex align="center" mr={4}>
-        <Image
-          src="/images/logo.png"
-          alt="logo"
-          boxSize="70px"
-          mr={4}
-        />
-        <Text fontSize="lg">CROSSWORD</Text>
+      <Image src="/images/logo.png" alt="logo" boxSize="70px" mr={4} />
+        <Link href="/">
+          <Text fontSize="lg">CROSSWORD</Text>
+        </Link>
       </Flex>
 
-      <Flex
-        align="center"
-        width="50%"
-        maxW="500px"
-        mx={4}
-        ml={250}
-        position="relative"
-      >
-        <Input
-          placeholder="Search by Title, Author, ISBN"
-          bg="white"
-          border="none"
-          borderRadius="md"
-          _placeholder={{ color: 'gray.500' }}
-          size="sm"
-          pr="4.5rem"
-          zIndex="1"
-        />
-        <Button
-          position="absolute"
-          right="0"
-          h="100%"
-          px={4}
-          colorScheme="blackAlpha"
-          bg="black"
-          color="white"
-          borderRadius="md"
-          _hover={{ bg: 'gray.800' }}
-          zIndex="2"
+      <SearchBar />
+
+      <Flex align="center">
+        {status === "authenticated" ? (
+          <Menu>
+            <MenuButton>
+              <Text>Hi!, {data?.user?.name}</Text>
+            </MenuButton>
+            <MenuList>
+              <MenuItem fontSize="small">
+                <Link href={data?.user?.role === "User" ? "/user/dashboard" : "/admin"}>
+                  MY ACCOUNT
+                </Link>
+              </MenuItem>
+              <MenuItem
+                fontSize="small"
+                onClick={() =>
+                  signOut({
+                    redirect: "/login",
+                  })
+                }
+              >LOGOUT</MenuItem>
+            </MenuList>
+          </Menu>
+        ) : (
+          <Link href="/login">
+            <IoPersonSharp size={24} />
+          </Link>
+        )}
+        <Link href="/wishlist">
+          <FaHeart size={24} style={{ marginLeft: 20 }} />
+        </Link>
+
+        <Link
+          href="/mybag"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            position:"relative"
+          }}
         >
-          <AiOutlineSearch size={20} />
-        </Button>
-      </Flex>
-
-      <Flex align="center" ml="auto">
-        <IoPersonSharp size={24} />
-        <FaHeart size={24} style={{ marginLeft: 20 }} />
-        <IoBagOutline size={24} style={{ marginLeft: 20 }} />
+          <IoBagOutline size={24} style={{ marginLeft: 20 }} />
+          <Badge bg="black" color="white" borderRadius="100%" style= {{
+            position: "absolute",
+            right: "-5px",
+            top: "-3px"
+          }}>{cart?.length || 0}</Badge>
+        </Link>
       </Flex>
     </Box>
   );

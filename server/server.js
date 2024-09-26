@@ -22,6 +22,7 @@ app.use(express.json()); // Parse JSON bodies
 app.use('/api/test', require('./routes/testRoutes'));
 app.use('/api/books', require('./routes/bookRoutes'));
 app.use('/api/cart', require('./routes/cartRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 
 // Image Storage Engine
 const storage = multer.diskStorage({
@@ -39,7 +40,7 @@ const storage = multer.diskStorage({
   app.post("/upload", upload.single('book'), (req, res) => {
       
     if (req.file) {
-      const imageUrl = `http://localhost:8000/images/${req.file.filename}`;
+      const imageUrl = `http://localhost:${PORT}/images/${req.file.filename}`;
       res.json({ success: true, image_url: imageUrl });
   } else {
       res.status(400).json({ success: false, message: 'No file uploaded' });

@@ -1,9 +1,4 @@
 "use client";
-
-import Header from '@/components/header';
-import HeaderSection from '@/components/HeaderSection';
-import CategoryTags from '@/components/Categorytags';
-import TextSlider from '@/components/Textslider';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -24,21 +19,80 @@ import {
   BreadcrumbLink
 } from '@chakra-ui/react';
 import { ChevronRightIcon, EditIcon} from '@chakra-ui/icons'; 
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import useCart from '@/providers/CartState';
 
-const BookDisplay = () => {
-  const router = useRouter(); 
+const BookDisplay = ({params}) => {
+
+  const { data } = useSession();
+  const toast = useToast();
+
+  const productId = params.id;
+  const [product, setProduct] = useState({});
+  const router = useRouter();
+
+  const{addProduct} = useCart();
+
+  const handleAddToBag = async () => {
+    addProduct({...product, quantity:1 })
+    const endpoint = await fetch("http://localhost:8000/api/cart/addtocart", {
+      method: "POST",
+      body: JSON.stringify({
+        productId,
+        userId: data?.user?.userId,
+        quantity: 1
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const resp = await endpoint.json();
+
+    if (resp.success) {
+      toast({
+        title: `${resp.message}`,
+        description: `${product?.name} has been added to your bag.`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: `${resp.message}`,
+        description: `${product?.name} could not add into bag.`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  useEffect(() => {
+    async function getBookById() {
+      const endpoint = await fetch(`http://localhost:8000/api/books/${productId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type" : "application/json"
+        }
+      })
+
+      const data = await endpoint.json();
+      console.log({data})
+      setProduct(data.book);
+    }
+
+    getBookById();
+
+  }, [productId]);
 
   const handleWriteReview = () => {
-    router.push('/review'); 
+    router.push(`/review?id=${productId}`); 
   };
 
   return (
     <Container maxW="container.x" py={0}>
-      <Header />
-      <HeaderSection />
-      <CategoryTags/>
-      <TextSlider/>
-
       <Box ml={8}>
         <Breadcrumb mb={6} separator={<ChevronRightIcon color="gray.500" />}>
           <BreadcrumbItem>
@@ -62,7 +116,7 @@ const BookDisplay = () => {
           ml={8}
         >
           <Image
-            src="/images/book1.png"
+            src={product?.image}
             alt="Book cover"
             width={65}
             height="100px"
@@ -72,7 +126,7 @@ const BookDisplay = () => {
 
         <Box flex="1">
           <Image
-            src="/images/book1.png"
+            src={product?.image}
             alt="Book cover"
             width={400}
             height={500}
@@ -83,9 +137,9 @@ const BookDisplay = () => {
 
         <Box flex="1" mr={100}>
           <VStack align="start" spacing={4}>
-            <Text fontSize="3xl" fontWeight={600}>The Women</Text>
-            <Text fontSize="sm" color="#1f4f95" mt={-2}>Author</Text>
-            <Text fontSize="3xl" fontWeight={600}>₹ 599 </Text>
+            <Text fontSize="3xl" fontWeight={600}>{product?.name}</Text>
+            <Text fontSize="sm" color="#1f4f95" mt={-2}>{product?.author}</Text>
+            <Text fontSize="3xl" fontWeight={600}>₹ {product?.price}</Text>
 
             <Select  
               width="80px"
@@ -113,6 +167,8 @@ const BookDisplay = () => {
       _hover={{ bg: 'black', color: 'white' }} 
       _active={{ bg: 'black', color: 'white' }}
       borderColor='black'
+
+      onClick={handleAddToBag}
     >
       ADD TO BAG
     </Button>

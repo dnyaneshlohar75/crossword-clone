@@ -1,67 +1,160 @@
-import React from 'react';
-import { Box, Image, Text, Button, ButtonGroup, useToast } from '@chakra-ui/react';
-import NextLink from 'next/link';
-import { IoMdHeartEmpty } from 'react-icons/io';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Image,
+  Text,
+  Button,
+  ButtonGroup,
+  useToast,
+  Stack,
+  Heading,
+} from "@chakra-ui/react";
+import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 
-const Item = ({ id, image, name, author, price }) => {
-    const toast = useToast();
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import useCart from "@/providers/CartState";
 
-    const handleAddToBag = () => {
-        toast({
-          title: "Added to Bag",
-          description: `${name} has been added to your bag.`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      };
+const Item = ({ id, image, name, author, price, discount }) => {
+  const { data } = useSession();
+  const toast = useToast();
+
+  const { cart, addProduct, addInitialCartData } = useCart();
+
+  const [wishlist, setWishlist] = useState([]);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+
+  const discountedPrice = Math.abs(price * (discount / 100) - price);
+
+  function isExist(productid) {
+    return cart?.some((book) => book._id === productid);
+  }
+
+  const handleWishlist = async () => {
+    const endpoint = await fetch(
+      "http://localhost:8000/api/users/wishlist/add",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          productId: id,
+          userId: data?.user?.userId,
+          quantity: 1,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const resp = await endpoint.json();
+
+    console.log(resp);
+
+    setWishlist(resp.wishlist?.products);
+  };
+
+  const removeFromWishlist = async () => {
+    const endpoint = await fetch(
+      "http://localhost:8000/api/users/wishlist/remove",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          productId: id,
+          userId: data?.user?.userId,
+          quantity: 1,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const resp = await endpoint.json();
+
+    console.log(resp);
+
+    setWishlist(resp.wishlist?.products);
+  };
+
+  useEffect(() => {
+    console.log(wishlist);
+    if (wishlist?.some((book) => book.product === id)) {
+      setIsInWishlist(true);
+    }
+  }, [handleWishlist, wishlist]);
+
+  const handleAddToBag = async () => {
+    addProduct({ _id: id, image, quantity: 1, name, author, price, discount });
+  };
 
   return (
-    <Box overflow="hidden" p={2}maxWidth="500px">
-      <NextLink href={`bookdisplay/${id}`} passHref>
-        <Box display="block">
-          {/* <Image
-             src={`http://localhost:8000/images/${image}`}
-             alt={name}
-             borderRadius="md"
-            _hover={{ cursor: 'pointer' }}
-          /> */}
-          <Image src="/images/book1.png" p={20} width="450px" height="400px"/>
+    <Box p={10}>
+      <Image src={image} alt={name} borderRadius="md" />
+      <Stack mt="4" spacing="3">
+        <Link href={`/bookdisplay/${id}`}>
+          <Heading size="sm" noOfLines={1} color="#000">
+            {name}
+          </Heading>
+        </Link>
+        <Text color="#1f4f95">{author}</Text>
+        <Box display="flex" alignItems="center" gap={3}>
+          <Text color="black.600" fontSize="xl">
+            {`₹ ${discountedPrice}`}
+          </Text>
+          {discount > 0 ? (
+            <>
+              {" "}
+              <Text as="s" color="gray.500" fontSize="md">
+                {`₹ ${price}`}
+              </Text>
+              <Text color="green.500" fontSize="md">
+                ({`${discount}`}%)
+              </Text>
+            </>
+          ) : (
+            <></>
+          )}
         </Box>
-      </NextLink>
-
-      <Text
-       ml={100} 
-       fontWeight={500}
-       fontSize="18px" 
-       color="#000" 
-       fontFamily="Montserrat" 
-       letterSpacing="0.5px"
-       mt={-14}
-     >{name} </Text>
-
-      <Text 
-       color="#1f4f95"
-       ml={105} 
-       fontWeight={500}
-       fontSize="12px"
-       mb={1} 
-       letterSpacing="0.5px"
-       > {author}</Text>
-      <Box>
-        <Text ml={130} fontSize="sm" color="#3e434b.500" letterSpacing="0.5px" mb={1}>
-          ₹ {price}
-        </Text>
-      </Box>
-
-      <Box display="flex" alignItems="center" marginLeft="90px">
-        <ButtonGroup variant='outline' spacing='6' size='xs'>
-          <Button colorScheme='black' fontSize="12px" letterSpacing="0.5px" onClick={handleAddToBag}>ADD TO BAG</Button>
-        </ButtonGroup>
-        <Box ml={4} display="flex" alignItems="center">
-          <IoMdHeartEmpty boxSize="24px" />
-        </Box>
-        </Box> 
+      </Stack>
+      <ButtonGroup spacing="2" justifyContent="center" mt={4}>
+       
+        {isExist(id) ? (
+          <Button>Go to Bag</Button>
+        ) : (
+          <Button
+            variant="ghost"
+            colorScheme="blue"
+            onClick={() => handleAddToBag()}
+          >
+            Add to bag
+          </Button>
+        )}
+        <Button
+          variant="ghost"
+          onClick={handleWishlist}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          border="1px solid transparent"
+        >
+           {isInWishlist ? (
+          <Button
+            variant="solid"
+            colorScheme="blue"
+            onClick={() => removeFromWishlist()}
+          >
+            <IoMdHeart />
+          </Button>
+        ) : (
+          <Button
+            variant="solid"
+            onClick={() => handleWishlist()}
+          >
+            <IoMdHeartEmpty />
+          </Button>
+        )}
+        </Button>
+      </ButtonGroup>
     </Box>
   );
 };

@@ -1,66 +1,83 @@
-const bcrypt = require("bcryptjs"); //verify & hashing password
+const bycrypt = require('bcrypt');
+const User = require('../models/userModel');
 
-const registerController = async (req, res) => {
-    try {
-      const { email, password, role } = req.body;
-      console.log('Received Data:', { email, password, role });
-  
-      // Validate role
-      const validRoles = ["User", "Admin"];
-      if (!validRoles.includes(role)) {
-        return res.status(400).send({
+const registerController =  async (req, res) => {
+  const { name, emailId, password, role } = req.body;
+
+  console.log({name, emailId, password, role})
+
+  try {
+    const existUser = await User.findOne({ email: emailId });
+
+    if (existUser) {
+      console.log("User exist");
+      return res
+        .json({
           success: false,
-          message: "Invalid role",
-        });
-      }
-  
-      // Ensure required fields are provided
-      if (!email || !password || !role) {
-        return res.status(400).send({
-          success: false,
-          message: "Email, password, and role are required",
-        });
-      }
-  
-      // Check if the user already exists
-      const existingUser = await userModel.findOne({ email });
-      if (existingUser) {
-        return res.status(400).send({
-          success: false,
-          message: "User already exists",
-        });
-      }
-  
-      // Hash the password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-  
-      // Create user data based on role
-      const userData = {
-        email,
-        password: hashedPassword,
-        role,
-      };
-  
-      // Create and save the new user
-      const user = new userModel(userData);
-      await user.save();
-  
-      return res.status(201).send({
-        success: true,
-        message: `${role} registered successfully`,
-        user,
-      });
-    } catch (error) {
-      console.log('Error:', error);
-      res.status(500).send({
-        success: false,
-        message: "Error in Register API",
-        error,
-      });
+          message: "Email id already exist.",
+        })
+        .status(401);
     }
-  };
+
+    
+    const hashedPassword = await bycrypt.hash(password, 18);
+
+    const newUser = await User.create({
+        email: emailId,
+        name,
+        password: hashedPassword,
+        role
+    })
+
+    if(!newUser) {
+        return res.json({
+            success: false,
+            message: "Cannot create an account, try again"
+        }).status(200)
+    }
+    
+    console.log(`new user created: ${newUser.id}`);
+
+    return res.json({
+        success: true,
+        message: "Account created successfully."
+    }).status(201);
+
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+
+  const loginController = async (req, res) => {
+
+    const { emailId, password } = req.body;
+  
+    // console.log({ emailId, password });
+  
+    const userExist = await User.findOne({ email: emailId })
+  
+    if (userExist != null) {
+      if (bycrypt.compareSync(password, userExist.password)) {
+        console.log("password match.. Login Successfull");
+        return res.json({
+          success: true,
+          message: "password match.. Login Successfull",
+          userExist
+        }).status(200);
+  
+        // console.log(userExist)
+      }
+      else {
+        console.log("password does not match.");
+        return res.json({
+          success: false,
+          message: "Password not matched"
+        })
+      }
+    }
+  }
   
   module.exports = { 
     registerController, 
+    loginController
 };

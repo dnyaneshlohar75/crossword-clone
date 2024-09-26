@@ -21,7 +21,10 @@ const SudhaMurthy = ({ category }) => {
         const response = await fetch(`http://localhost:8000/api/books/category/sudha-murthy`);
         if (!response.ok) throw new Error('Failed to fetch books');
         const data = await response.json();
+
+        console.log(data);
         setBooks(data.books);
+
       } catch (error) {
         setError(error.message);
       } finally {
@@ -93,7 +96,7 @@ const SudhaMurthy = ({ category }) => {
 
   return (
     <Box p={5}>
-      <Heading mt={10} textAlign="center" fontSize="30px" fontWeight={500}>Sudha Murthy Books</Heading>
+      <Heading mt={10} textAlign="center" fontSize="30px" fontWeight={500} mb={20}>Sudha Murthy Books</Heading>
       {books.length > 0 ? (
 
        <Carousel
@@ -110,15 +113,18 @@ const SudhaMurthy = ({ category }) => {
        customLeftArrow={<CustomLeftArrow />}
        customRightArrow={<CustomRightArrow />}>
           {books.map((book) => (
-            <Item
-            key={book._id}
-            id={book._id}
-            name={book.name}
-            image={book.image}
-            author={book.author}
-            price={book.price}
-            />
+           <Item
+           key={book._id}
+           id={book._id}
+           name={book.name}
+           image={book.image}
+           author={book.author}
+           price={book.price}
+           discount = {book.discount}
+         />
           ))}
+            <Box  border={5} borderColor={"black"}>
+            </Box>
           </Carousel>
       ) : (
         <Text>No books found for {category}.</Text>

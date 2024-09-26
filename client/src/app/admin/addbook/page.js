@@ -9,12 +9,15 @@ import Sidebar from '../sidebar/page';
 const AddBook = () => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+
   const [bookDetails, setBookDetails] = useState({
     name: '',
     author: '',
     price: '',
+    discount: '',
     category: 'sudha-murthy',
     image: '',
+    description: ''
   });
   const toast = useToast();
 
@@ -23,11 +26,13 @@ const AddBook = () => {
       const objectUrl = URL.createObjectURL(image);
       setImagePreview(objectUrl);
 
+      console.log(objectUrl);
+
       return () => URL.revokeObjectURL(objectUrl);
     } else {
       setImagePreview(null);
     }
-  }, [image]);
+  }, [image, imagePreview]);
 
   const imageHandler = (e) => {
     if (e.target.files.length > 0) {
@@ -45,6 +50,9 @@ const AddBook = () => {
       if (image) {
         formData.append('book', image);
       }
+
+      console.log(bookDetails)
+      console.log(formData)
   
       const uploadResponse = await fetch('http://localhost:8000/upload', {
         method: 'POST',
@@ -61,13 +69,16 @@ const AddBook = () => {
       if (uploadData.success) {
         const updatedBookDetails = { ...bookDetails, image: uploadData.image_url };
   
-        const addBookResponse = await fetch('http://localhost:8000/addbook', {
+        const addBookResponse = await fetch('http://localhost:8000/api/books/addbook', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
           },
-          body: JSON.stringify(updatedBookDetails),
+          body: JSON.stringify({
+            id: Math.random(1, 50200),
+            ...updatedBookDetails
+          }),
         });
   
         if (!addBookResponse.ok) {
@@ -122,15 +133,11 @@ const AddBook = () => {
   };
   
 
-  return (
-    <Container maxW="container.x" p={6}>
-      <Header /> 
-      <HeaderSection />
-      
-      <Box display="flex">
+  return (     
+      <Box display="flex"> 
         <Sidebar />
         
-        <Box flex="1" p={6} maxW="800px" mx="auto" ml={50}>
+        <Box flex="1" p={6} maxW="1500px" mx="auto" ml={50} maxHeight="550px" overflowY="auto" >
           <Stack spacing={4}>
             <FormControl id="name">
               <FormLabel>Book Name</FormLabel>
@@ -161,6 +168,28 @@ const AddBook = () => {
                 onChange={changeHandler}
                 type="text"
                 name="price"
+                placeholder="Type here"
+              />
+            </FormControl>
+
+            <FormControl id="price">
+              <FormLabel>Discount Percentage</FormLabel>
+              <Input
+                value={bookDetails.discount}
+                onChange={changeHandler}
+                type="text"
+                name="discount"
+                placeholder="Type here"
+              />
+            </FormControl>
+
+            <FormControl id="description">
+              <FormLabel>Book Description</FormLabel>
+              <Input
+                value={bookDetails.description}
+                onChange={changeHandler}
+                type="text"
+                name="description"
                 placeholder="Type here"
               />
             </FormControl>
@@ -207,8 +236,8 @@ const AddBook = () => {
             </Button>
           </Stack>
         </Box>
+
       </Box>
-    </Container>
   );
 };
 
