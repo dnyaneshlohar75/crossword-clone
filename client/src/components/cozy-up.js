@@ -114,13 +114,14 @@ const CozyUp = ({ category }) => {
        customLeftArrow={<CustomLeftArrow />}
        customRightArrow={<CustomRightArrow />}>
           {books.map((book) => (
-            <Item
-            key={book._id}
-            id={book._id}
-            name={book.name}
-            image={book.image}
-            author={book.author}
-            price={book.price}
+              <Item
+              key={book._id}
+              id={book._id}
+              name={book.name}
+              image={book.image}
+              author={book.author}
+              price={book.price}
+              discount = {book.discount}
             />
           ))}
           </Carousel>

@@ -120,7 +120,8 @@ const Preorder = ({ category }) => {
             image={book.image}
             author={book.author}
             price={book.price}
-            />
+            discount = {book.discount}
+          />
           ))}
           </Carousel>
       ) : (

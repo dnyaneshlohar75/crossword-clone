@@ -97,7 +97,29 @@ const addToCartController = async (req, res) => {
   }
 
   const removeProductWishlist = async (req, res) => {
-  }
+    const { userId, productId } = req.body;
+  
+    if (!userId || !productId) {
+      return res.status(400).json({ message: "User ID and Product ID are required." });
+    }
+  
+    try {
+      const wishlist = await Wishlist.findOneAndUpdate(
+        { userId: userId },
+        { $pull: { products: { product: productId } } }, 
+        { new: true } 
+      );
+  
+      if (!wishlist) {
+        return res.status(404).json({ message: "Wishlist not found." });
+      }
+  
+      return res.status(200).json({ message: "Product removed from wishlist.", wishlists: wishlist });
+    } catch (error) {
+      console.error("Error removing product from wishlist:", error);
+      return res.status(500).json({ message: "Internal server error." });
+    }
+  };
 
   const getAllCartsController = async (req, res) => {
     const { userId } = req.body;

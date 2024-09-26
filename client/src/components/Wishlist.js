@@ -26,12 +26,30 @@ export default function Wishlist() {
       .catch((error) => console.error(error));
   }, [data]);
 
+  const handleRemoveFromWishlist = (productId) => {
+    fetch("http://localhost:8000/api/users/removedfromwishlist", {
+      method: "DELETE",
+      body: JSON.stringify({
+        userId: data?.user?.userId,
+        productId: productId,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setWishlist(data.wishlists);
+      })
+      .catch((error) => console.error(error));
+  };
+
   return (
-    <Box p={5}>
+    <Box p={20}>
       <Heading mb={6} fontSize={25} color="#444444" textAlign="center">
         My Wishlist
       </Heading>
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 6}} spacing={6}>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 5}} spacing={6}>
         {myWishlists?.map((wishlist) =>
           wishlist?.products?.map((product) => (
             <Stack key={product?.product?.id} align="center">
@@ -42,6 +60,7 @@ export default function Wishlist() {
                 alt={product?.product?.name}
               />
               <Text mt={2} fontWeight="bold">{product?.product?.name}</Text>
+              <Text color="#1f4f95">{product?.product?.author}</Text>
               <Text color="black.600" fontSize="md">₹ {product?.product?.price}</Text>
 
               <Flex alignItems="center" mt={2}>
@@ -64,7 +83,10 @@ export default function Wishlist() {
                 >
                   BUY NOW
                 </Button>
-                <DeleteIcon ml={3} cursor="pointer"  />
+                <DeleteIcon 
+                  ml={3}
+                  cursor="pointer"
+                  onClick={() => handleRemoveFromWishlist(product?.product?.id)}  />
               </Flex>
             </Stack>
           ))
