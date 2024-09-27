@@ -14,6 +14,19 @@ const Dashboard = () => {
   return (
     <Container p={0} maxW="100%" m={0}>
      <TextSlider/>
+     <Box 
+        overflowY="scroll" 
+        maxH="490px" 
+        style={{
+          scrollbarWidth: 'none', // For Firefox
+          msOverflowStyle: 'none', // For Internet Explorer and Edge
+        }}   
+        sx={{
+          '&::-webkit-scrollbar': {
+            display: 'none', // For Chrome, Safari, and Opera
+          },
+        }}   
+      >
      <ImageSlider/>  
      <SudhaMurthy/>
      <CozyUp/>
@@ -21,6 +34,7 @@ const Dashboard = () => {
      {/* <Noteworthy/> */}
      <Box>
        <Footer/>
+     </Box>
      </Box>
     </Container>
   );

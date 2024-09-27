@@ -33,7 +33,7 @@ const EditBookPage = () => {
     const fetchBook = async () => {
       if (id) {
         try {
-          const response = await axios.get(`/books/${id}`);
+          const response = await axios.get(`http://localhost:8000/api/books/${id}`);
           if (response.data.book) {
             setBook(response.data.book);
           } else {
@@ -125,7 +125,7 @@ const EditBookPage = () => {
         <Box  p={4}>
           <form onSubmit={handleSubmit}>
             <VStack spacing={4} align="stretch">
-              <FormControl id="image" isRequired>
+              <FormControl id="image">
                 <FormLabel color="gray.600">Upload New Image</FormLabel>
                 <Input
                   type="file"
