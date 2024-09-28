@@ -11,6 +11,7 @@ import {
   Container,
   SimpleGrid,
   Divider,
+  Button,
 } from "@chakra-ui/react";
 import { CloseIcon, SmallCloseIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
@@ -35,16 +36,31 @@ const ListBook = () => {
   }, []);
 
   // Remove a book by ID
-  const removeBook = async (id) => {
+  const removeBook = async (productId) => {
+    const r = confirm("Do you want to delete this product? ");
+    if(!r) {
+      return;
+    }
     try {
-      await fetch("http://localhost:8000/books/removebook", {
-        method: "POST",
+      const api = await fetch("http://localhost:8000/api/books/removebook", {
+        method: "DELETE",
+        body: JSON.stringify({
+          productId,
+        }),
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id }),
+        }
       });
+
+      const resp = await api.json();
+
+      if(resp?.success) {
+        alert(`${resp?.name} is deleted`);
+      } else {
+        alert(`${resp?.name} is not deleted`);
+      }
+
       fetchInfo();
     } catch (error) {
       console.error("Error removing book:", error);
@@ -100,12 +116,14 @@ const ListBook = () => {
                         size="sm"
                       />
                     </NextLink>
-                    <IconButton
-                      aria-label="Delete"
-                      icon={<DeleteIcon />}
-                      colorScheme="red"
-                      size="sm"
-                    />
+                      <IconButton
+                        onClick = {() => removeBook(book._id)}
+                        aria-label="Delete"
+                        icon={<DeleteIcon />}
+                        colorScheme="red"
+                        size="sm"
+                      />
+
                   </HStack>
                   {/* <SmallCloseIcon/> */}
                   {/* <IconButton
