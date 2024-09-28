@@ -14,15 +14,14 @@ import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import useCart from "@/providers/CartState";
+import useWishlist from "@/providers/WishlistState";
 
 const Item = ({ id, image, name, author, price, discount }) => {
   const { data } = useSession();
   const toast = useToast();
 
   const { cart, addProduct, addInitialCartData } = useCart();
-
-  const [wishlist, setWishlist] = useState([]);
-  const [isInWishlist, setIsInWishlist] = useState(false);
+  const { wishlist, addProductInWishlist, removeProductInWishlist } = useWishlist();
 
   const discountedPrice = Math.abs(price * (discount / 100) - price);
 
@@ -31,61 +30,36 @@ const Item = ({ id, image, name, author, price, discount }) => {
   }
 
   const handleWishlist = async () => {
-    const endpoint = await fetch(
-      "http://localhost:8000/api/users/wishlist/add",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          productId: id,
-          userId: data?.user?.userId,
-          quantity: 1,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    const resp = await endpoint.json();
-
-    console.log(resp);
-
-    setWishlist(resp.wishlist?.products);
+    addProductInWishlist({
+      id, image, name, author, price, discount
+    })
   };
 
-  const removeFromWishlist = async () => {
-    const endpoint = await fetch(
-      "http://localhost:8000/api/users/wishlist/remove",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          productId: id,
-          userId: data?.user?.userId,
-          quantity: 1,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    const resp = await endpoint.json();
-
-    console.log(resp);
-
-    setWishlist(resp.wishlist?.products);
+  const isProductExistInWishlist = async () => {
+    fetch("http://localhost:8000/api/users/mywishlist", {
+      method: "POST",
+      body: JSON.stringify({
+        userId: data?.user?.userId,
+      }),
+      
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setIsInWishlist(resp.exist);
+      })  
+      .catch((error) => console.error(error));
   };
-
-  useEffect(() => {
-    console.log(wishlist);
-    if (wishlist?.some((book) => book.product === id)) {
-      setIsInWishlist(true);
-    }
-  }, [handleWishlist, wishlist]);
+  const removeFromWishlist = async (productId) => {
+    removeProductInWishlist(productId);
+  };
 
   const handleAddToBag = async () => {
     addProduct({ _id: id, image, quantity: 1, name, author, price, discount });
-  };
+  }
 
   return (
     <Box p={10}>
@@ -117,8 +91,8 @@ const Item = ({ id, image, name, author, price, discount }) => {
         </Box>
       </Stack>
       <ButtonGroup spacing="2" justifyContent="center" mt={4}>
-       
-        {isExist(id) ? (
+
+      {isExist(id) ? (
           <Button  
           display="flex"
           alignItems="center"
@@ -166,11 +140,11 @@ const Item = ({ id, image, name, author, price, discount }) => {
           justifyContent="center"
           border="1px solid transparent"
         >
-           {isInWishlist ? (
+           {wishlist?.find((item) => item.id === id) ? (
           <Button
             variant="solid"
             colorScheme="blue"
-            onClick={() => removeFromWishlist()}
+            onClick={() => removeFromWishlist(id)}
           >
             <IoMdHeart />
           </Button>

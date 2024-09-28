@@ -96,7 +96,7 @@ const SudhaMurthy = ({ category }) => {
 
   return (
     <Box p={5}>
-      <Heading mt={10} textAlign="center" fontSize="30px" fontWeight={500} mb={20}>Sudha Murthy Books</Heading>
+      <Heading mt={10} textAlign="center" fontSize="30px" fontWeight={500} >Sudha Murthy Books</Heading>
       {books.length > 0 ? (
 
        <Carousel
@@ -104,7 +104,7 @@ const SudhaMurthy = ({ category }) => {
        draggable={false}
        responsive={responsive}
        ssr={true} 
-       infinite={true}
+      mb={0} infinite={true}
        autoPlaySpeed={1000}
        keyBoardControl={true}
        customTransition="all .5"

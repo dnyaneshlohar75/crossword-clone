@@ -16,7 +16,7 @@ const Dashboard = () => {
      <TextSlider/>
      <Box 
         overflowY="scroll" 
-        maxH="490px" 
+        maxH="590px" 
         style={{
           scrollbarWidth: 'none', // For Firefox
           msOverflowStyle: 'none', // For Internet Explorer and Edge

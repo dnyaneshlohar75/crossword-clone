@@ -46,7 +46,7 @@ function ImageSlider() {
       <Box
         position="relative"
         width="full"
-        height="400px"
+        height="500px"
         overflow="hidden"
         p={0}
       >
@@ -59,7 +59,7 @@ function ImageSlider() {
         />
         <Box
           position="absolute"
-          bottom="10px"
+          bottom="50px"
           width="full"
           display="flex"
           justifyContent="center"

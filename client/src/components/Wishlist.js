@@ -4,27 +4,32 @@ import { Box, Flex, Button, Heading, Image, SimpleGrid, Stack, Text } from '@cha
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import { DeleteIcon } from '@chakra-ui/icons'
+import useWishlist from "@/providers/WishlistState";
 
 export default function Wishlist() {
-  const [myWishlists, setWishlist] = useState([]);
+  const { wishlist, removeProductInWishlist } = useWishlist();
   const { data } = useSession();
 
-  useEffect(() => {
-    fetch("http://localhost:8000/api/users/mywishlist", {
-      method: "POST",
-      body: JSON.stringify({
-        userId: data?.user?.userId,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setWishlist(data.wishlists);
-      })
-      .catch((error) => console.error(error));
-  }, [data]);
+  // useEffect(() => {
+  //   fetch("http://localhost:8000/api/users/mywishlist", {
+  //     method: "POST",
+  //     body: JSON.stringify({
+  //       userId: data?.user?.userId,
+  //     }),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setWishlist(data.wishlists);
+  //     })
+  //     .catch((error) => console.error(error));
+  // }, [data]);
+
+  const removeFromWishlist = (productId) => {
+    removeProductInWishlist(productId);
+  }
 
   const handleRemoveFromWishlist = (productId) => {
     fetch("http://localhost:8000/api/users/removedfromwishlist", {
@@ -50,18 +55,18 @@ export default function Wishlist() {
         My Wishlist
       </Heading>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 5}} spacing={6}>
-        {myWishlists?.map((wishlist) =>
-          wishlist?.products?.map((product) => (
-            <Stack key={product?.product?.id} align="center">
+      {wishlist &&
+        wishlist?.map((item) => (
+            <Stack key={item.id} align="center">
               <Image
                 
                 objectFit="cover"
-                src={product?.product?.image}
-                alt={product?.product?.name}
+                src={item.image}
+                alt={item.name}
               />
-              <Text mt={2} fontWeight="bold">{product?.product?.name}</Text>
-              <Text color="#1f4f95">{product?.product?.author}</Text>
-              <Text color="black.600" fontSize="md">₹ {product?.product?.price}</Text>
+              <Text mt={2} fontWeight="bold">{item.name}</Text>
+              <Text color="#1f4f95">{item.author}</Text>
+              <Text color="black.600" fontSize="md">₹ {item.price}</Text>
 
               <Flex alignItems="center" mt={2}>
                 <Button
@@ -86,10 +91,10 @@ export default function Wishlist() {
                 <DeleteIcon 
                   ml={3}
                   cursor="pointer"
-                  onClick={() => handleRemoveFromWishlist(product?.product?.id)}  />
+                  onClick={() => removeFromWishlist(item.id)}  />
               </Flex>
             </Stack>
-          ))
+          )
         )}
       </SimpleGrid>
     </Box>

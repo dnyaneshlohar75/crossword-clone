@@ -96,7 +96,7 @@ const CozyUp = ({ category }) => {
 
   return (
     <Box p={5}>
-      <Heading mt={10} textAlign="center" fontSize="30px" fontWeight={500} mb={20}>Heartwarming Cozy Reads
+      <Heading mt={10} textAlign="center" fontSize="30px" fontWeight={500} mb={0}>Heartwarming Cozy Reads
       </Heading>
       {books.length > 0 ? (
 

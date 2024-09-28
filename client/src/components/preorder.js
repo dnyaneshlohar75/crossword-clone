@@ -96,7 +96,7 @@ const Preorder = ({ category }) => {
 
   return (
     <Box p={5}>
-      <Heading mt={10} textAlign="center" fontSize="30px" fontWeight={500} mb={20}>Pre-Order Books</Heading>
+      <Heading mt={10} textAlign="center" fontSize="30px" fontWeight={500} mb={0}>Pre-Order Books</Heading>
       {books.length > 0 ? (
 
        <Carousel

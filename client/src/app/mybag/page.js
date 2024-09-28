@@ -102,7 +102,7 @@ export default function Page() {
                   src={product?.image}
                   alt={product?.name}
                   objectFit={"cover"}
-                />
+                /> 
               </Box>
               <Box>
                 <Heading size={"md"}>{product?.name}</Heading>
